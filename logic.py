@@ -264,21 +264,21 @@ def obtener_transaccion_completa_por_id_logic(transaccion_id: int, ingenio_id: i
 def obtener_uuid_factura_por_id_logic(transaccion_id: int, ingenio_id: int):
     """Obtiene el UUID de una factura de forma optimizada."""
     with sqlite3.connect(DB_NAME) as conn:
-        c = conn.cursor()
-        resultado = obtener_uuid_factura_por_id_db(conn, transaccion_id, ingenio_id)
+        uuid_existente = obtener_uuid_factura_por_id_db(conn, transaccion_id, ingenio_id)
 
-        # Si la transacción existe (resultado no es None) pero no tiene UUID (resultado[0] es None),
-        # se lo asignamos ahora. Esto da compatibilidad a transacciones antiguas.
-        if resultado is not None and resultado[0] is None:
+        # Si la función de DB devuelve un valor (la transacción existe y es del tipo correcto)
+        # pero el UUID en sí es None, lo creamos y asignamos.
+        if uuid_existente is None:
+            c = conn.cursor()
             nuevo_uuid = str(uuid.uuid4())
             c.execute(
                 "UPDATE transacciones SET factura_uuid = ? WHERE id = ? AND ingenio_id = ?",
                 (nuevo_uuid, transaccion_id, ingenio_id)
             )
             conn.commit()
-            print(f"UUID asignado a la transacción antigua {transaccion_id}")
             return nuevo_uuid
-        return resultado[0] if resultado is not None else None
+
+        return uuid_existente
 
 def obtener_datos_factura_logic(transaccion_id: int, ingenio_id: int, tipos=('venta',)):
     """Obtiene todos los datos necesarios para generar una factura de una transacción."""

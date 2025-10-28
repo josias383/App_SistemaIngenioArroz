@@ -1,21 +1,28 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, session, g, make_response, jsonify
 from functools import wraps
 import os
+import logging
 from jinja2 import pass_context
-from dotenv import load_dotenv
-from logger import setup_logger
+
 
 def create_app():
-    load_dotenv()  # Carga variables desde el archivo .env
     app = Flask(__name__)
 
-    # Configuración segura: SECRET_KEY desde variable de entorno.
-    # En producción, la configurarás en el panel del servicio de hosting.
-    # Para desarrollo local, puedes crear un archivo .env con: SECRET_KEY='un-valor-secreto-largo'
-    app.secret_key = os.getenv('SECRET_KEY', os.urandom(24).hex())
+    # Configuración segura: SECRET_KEY desde variable de entorno o archivo .env cargado por el entorno
+    secret = os.getenv('SECRET_KEY')
+    if not secret:
+        # Fallback para desarrollo: generar una clave temporal en tiempo de ejecución
+        # Recomendado: definir SECRET_KEY en variables de entorno en producción
+        secret = os.urandom(24).hex()
+    app.secret_key = secret
 
     # Set up logger
-    setup_logger()
+    logger = logging.getLogger('flask-api-service')
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
     # --- Filtro Jinja2 personalizado para mostrar unidades ---
     @pass_context
@@ -87,6 +94,6 @@ def create_app():
     return app
 
 
-if __name__ == '__main__':
-    app = create_app()
+app = create_app() # La instancia de la aplicación se crea aquí para que Gunicorn la encuentre
+if __name__ == '__main__': # Este bloque solo se ejecuta si corres app.py directamente
     app.run(host='0.0.0.0', port=5000, debug=True)

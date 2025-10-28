@@ -141,7 +141,7 @@
           {% elif tipo in ['servicio_secado', 'servicio_pelado'] %}
             <div class="actions-container">
               <button class="action-button qr-button" data-id="{{ id }}" style="background-color: #28a745;">Compartir (QR)</button>
-              <a href="{{ url_for('reports.generar_factura_servicio', transaccion_id=id) }}" class="action-button" style="background-color: #007bff;">Factura (.docx)</a>
+              <a href="{{ url_for('reports.generar_factura', transaccion_id=id) }}" class="action-button" style="background-color: #007bff;">Factura (.docx)</a>
             </div>
           {% endif %}
         </td>
@@ -215,20 +215,51 @@
         qrImage.style.display = 'none';
         qrLoadingText.style.display = 'block';
         modal.style.display = 'flex';
-
-        // Asignar el `src` inicia la carga.
-        qrImage.src = `/api/qr_code/${transaccionId}`;
-
-        // Cuando la imagen se cargue correctamente, la mostramos.
+        
+        // Cuando la nueva imagen del QR se haya cargado completamente en el navegador...
         qrImage.onload = () => {
+          // ...ocultar el texto de "cargando" y mostrar la imagen.
           qrLoadingText.style.display = 'none';
           qrImage.style.display = 'block';
         };
-        
-        // Si hay un error (ej. 404), mostramos un mensaje de error.
+        // Si hay un error al cargar la imagen (ej. factura no encontrada)
         qrImage.onerror = () => {
           qrLoadingText.textContent = 'Error al generar el QR. Intente de nuevo.';
-          qrImage.style.display = 'none'; // Asegurarse de que la imagen rota no se muestre
+        };
+        // Iniciar la carga de la nueva imagen. Esto debe ir al final.
+        qrImage.src = `/api/qr_code/${transaccionId}`;
+      });
+    });
+
+    closeButton.addEventListener('click', () => {
+      modal.style.display = 'none';
+      qrImage.src = ''; // Limpiar la imagen para la próxima vez
+    });
+
+    // --- Lógica para el Modal del Código QR (versión anterior para referencia) ---
+    /*
+    const modal = document.getElementById('qr-modal');
+    const closeButton = modal.querySelector('.close-button');
+    const qrButtons = document.querySelectorAll('.qr-button');
+    const qrImage = document.getElementById('qr-code-image');
+    const qrLoadingText = document.getElementById('qr-loading-text');
+
+    qrButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const transaccionId = this.getAttribute('data-id');
+        
+        // Mostrar texto de carga y ocultar imagen anterior
+        qrImage.style.display = 'none';
+        qrLoadingText.style.display = 'block';
+        modal.style.display = 'flex';
+
+        // Establecer la fuente de la imagen para cargar el nuevo QR
+        qrImage.src = `/api/qr_code/${transaccionId}`;
+        
+        // Cuando la imagen se cargue, ocultar el texto de carga
+        qrImage.onload = () => {
+          qrLoadingText.style.display = 'none';
+          qrImage.style.display = 'block';
         };
       });
     });
@@ -236,8 +267,8 @@
     closeButton.addEventListener('click', () => {
       modal.style.display = 'none';
       qrImage.src = ''; // Limpiar la imagen para la próxima vez
-      qrLoadingText.textContent = 'Generando QR...'; // Resetear texto de carga
     });
+    */
   });
 </script>
 {% endblock %}

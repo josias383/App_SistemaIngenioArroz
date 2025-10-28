@@ -234,9 +234,3 @@ def dashboard_export_excel():
         download_name=filename,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
-
-@main_bp.route('/productos')
-@login_required
-def productos():
-    productos = obtener_productos()
-    return render_template('productos.html', productos=productos)

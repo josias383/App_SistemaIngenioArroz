@@ -347,7 +347,10 @@
   {% if g.user %}
     <div id="sidebar" class="sidebar">
       <div class="sidebar-header">
-        <span class="sidebar-title text">Sistema Arroz</span>
+        <span class="sidebar-title text">
+          <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="height: 40px; vertical-align: middle; margin-right: 10px;">
+          Sistema Arroz
+        </span>
         <button id="sidebar-toggle" class="sidebar-toggle-btn" title="Ocultar/Mostrar menú">☰</button>
       </div>
       <nav class="sidebar-nav">
@@ -374,7 +377,9 @@
           </div>
         </div>
 
-        <a href="{{ url_for('reports.productos') }}" class="{{ 'active' if request.endpoint == 'reports.productos' else '' }}"><span class="icon">🌾</span><span class="text">Productos</span></a>
+        <a href="{{ url_for('reports.productos') }}" class="{{ 'active' if request.endpoint == 'reports.productos' else '' }}">
+          <span class="icon"><img src="{{ url_for('static', filename='images/productos_icon.png') }}" alt="Productos" style="height: 24px; width: 24px;"></span><span class="text">Productos</span>
+        </a>
         
         {% if g.user.nivel_acceso == 'jefe' %}
           {% set gestiones_endpoints = ['management.gestionar_almacenes', 'management.gestionar_variedades', 'management.gestionar_usuarios', 'management.crear_usuario', 'management.ingenios'] %}

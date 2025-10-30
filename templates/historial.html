@@ -227,7 +227,7 @@
           qrLoadingText.textContent = 'Error al generar el QR. Intente de nuevo.';
         };
         // Iniciar la carga de la nueva imagen. Esto debe ir al final.
-        qrImage.src = `/api/qr_code/${transaccionId}`;
+        qrImage.src = `{{ url_for('reports.generar_qr_code', transaccion_id=0) }}`.replace('0', transaccionId);
       });
     });
 
@@ -254,7 +254,7 @@
         modal.style.display = 'flex';
 
         // Establecer la fuente de la imagen para cargar el nuevo QR
-        qrImage.src = `/api/qr_code/${transaccionId}`;
+        qrImage.src = `{{ url_for('reports.generar_qr_code', transaccion_id=0) }}`.replace('0', transaccionId);
         
         // Cuando la imagen se cargue, ocultar el texto de carga
         qrImage.onload = () => {
